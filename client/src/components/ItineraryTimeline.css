@@ -1,0 +1,339 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Summary bar */
+.trip-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #ffffff;
+  border: 1px solid #e2dcd2;
+  border-radius: 8px;
+  padding: 20px 24px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-label {
+  font-size: 12px;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--slate);
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--ivory);
+}
+
+.summary-value.gold { color: #6c594a; }
+
+.summary-divider {
+  width: 1px;
+  height: 36px;
+  background: #e2dcd2;
+}
+
+/* Day card */
+.day-card {
+  background: #ffffff;
+  border: 1px solid #e2dcd2;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.day-card.open {
+  border-color: #6c594a;
+  box-shadow: 0 2px 8px rgba(108, 89, 74, 0.1);
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  width: 100%;
+  background: none;
+  color: var(--ivory);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.day-header:hover {
+  background: #f8faf7;
+}
+
+.day-number {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  background: #deb596;
+  border: 1px solid #d4e8dd;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.day-num-label {
+  font-size: 10px;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  color: #4f6052;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.day-num-value {
+  font-size: 20px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: #4f6052;
+  line-height: 1.1;
+}
+
+.day-info { flex: 1; min-width: 0; }
+
+.day-title {
+  font-size: 18px;
+  font-family: var(--font-body);
+  color: var(--ivory);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.day-date {
+  font-size: 13px;
+  color: var(--slate);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.day-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.day-budget {
+  font-size: 12px;
+  font-family: var(--font-body);
+  color: #4f6052;
+  background: #deb596;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #d4e8dd;
+  font-weight: 500;
+}
+
+.day-chevron {
+  font-size: 14px;
+  color: var(--slate);
+  transition: transform 0.2s ease;
+}
+
+/* Day body */
+.day-body {
+  padding: 0 20px 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.day-summary {
+  font-size: 15px;
+  color: var(--slate-light);
+  line-height: 1.7;
+  padding: 0 0 var(--space-lg);
+  border-bottom: 1px solid rgba(201,169,110,0.1);
+  margin-bottom: var(--space-lg);
+  font-style: italic;
+}
+
+/* Activities */
+.activities-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: 52px 24px 1fr;
+  gap: 0 12px;
+  cursor: pointer;
+  transition: background var(--transition);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin: 0 -4px;
+}
+
+.activity-item:hover { background: rgba(201,169,110,0.04); }
+.activity-item.highlighted { background: rgba(201,169,110,0.09); }
+
+.activity-time {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--slate);
+  padding-top: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.activity-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 18px;
+}
+
+.activity-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid var(--navy);
+  box-shadow: 0 0 0 2px rgba(201,169,110,0.2);
+}
+
+.connector-line {
+  width: 1px;
+  flex: 1;
+  min-height: 24px;
+  background: rgba(201,169,110,0.2);
+  margin: 4px 0;
+}
+
+.activity-content {
+  padding: 12px 0 20px;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.activity-icon { font-size: 16px; }
+
+.activity-name {
+  font-size: 16px;
+  font-family: var(--font-display);
+  color: var(--ivory);
+  flex: 1;
+}
+
+.activity-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.activity-desc {
+  font-size: 14px;
+  color: var(--slate-light);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.activity-tip {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gold-light);
+  background: rgba(201,169,110,0.07);
+  border-left: 2px solid var(--gold);
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.tip-icon { flex-shrink: 0; }
+
+.activity-footer {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.activity-meta-item {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--slate);
+}
+
+/* Accommodation */
+.accommodation-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: rgba(108,89,74,0.07);
+  border: 1px solid rgba(108,89,74,0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.acc-icon { font-size: 22px; }
+
+.acc-details { flex: 1; }
+
+.acc-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ivory);
+  font-family: var(--font-display);
+}
+
+.acc-address {
+  font-size: 12px;
+  color: var(--slate-light);
+  margin-top: 2px;
+}
+
+.acc-cost {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.acc-cost-value {
+  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--success);
+}
+
+.acc-cost-label {
+  font-size: 11px;
+  color: var(--slate);
+  display: block;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 600px) {
+  .trip-summary { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  .summary-divider { display: none; }
+  .day-header { padding: var(--space-md); gap: var(--space-md); }
+  .day-body { padding: 0 var(--space-md) var(--space-md); }
+  .activity-item { grid-template-columns: 44px 20px 1fr; }
+  .day-meta { flex-direction: column; align-items: flex-end; gap: 4px; }
+}

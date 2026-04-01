@@ -1,0 +1,131 @@
+.map-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.map-day-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.day-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  background: #e8e3d8;
+  border: 1px solid #d9d1c6;
+  color: var(--slate);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.day-tab:hover {
+  border-color: #6c594a;
+  color: var(--ivory);
+  background: #f0f5f2;
+}
+
+.day-tab.active {
+  background: #deb596;
+  border-color: #6c594a;
+  color: #4f6052;
+  font-weight: 600;
+}
+
+.map-container {
+  width: 100%;
+  height: 500px; min-height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e2dcd2;
+  background: #f0ede6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #f0ede6;
+  color: var(--slate);
+  font-size: 14px;
+}
+
+.map-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #d9d1c6;
+  border-top-color: #6c594a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.map-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 300px;
+  background: #ffffff;
+  border: 1px dashed #d9d1c6;
+  border-radius: 8px;
+  color: var(--slate);
+  text-align: center;
+  padding: 24px;
+}
+
+.map-error-icon { font-size: 40px; }
+
+.map-error p {
+  font-size: 14px;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+/* Legend */
+.map-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  color: var(--slate);
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Google Maps info window override */
+.gm-style .gm-style-iw-c {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+.gm-style .gm-style-iw-t::after {
+  background: #ffffff !important;
+}
