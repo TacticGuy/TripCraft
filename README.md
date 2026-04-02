@@ -11,9 +11,13 @@ AI-powered travel itinerary generator.
 
 ## Setup
 
-### 1. Install Dependencies
+### 1. Clone and Install Dependencies
 
 ```bash
+# Clone the repository
+git clone <repo-url>
+cd tripcraft-modified
+
 # Install server dependencies
 cd server
 npm install
@@ -48,6 +52,16 @@ npm run dev
 ```
 
 Open http://localhost:5173 in your browser.
+
+## Troubleshooting
+
+**"Failed to fetch" error?**
+1. Make sure the backend server is running (`npm run dev` in server directory)
+2. Check that `client/.env` has `VITE_API_URL=http://localhost:5000/api`
+3. Restart the client after creating/updating `.env` file
+
+**"Cannot find package" errors?**
+- Run `npm install` in the `server` directory to install all dependencies
 
 ## Features
 - AI-powered itinerary generation

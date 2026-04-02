@@ -70,13 +70,13 @@ router.post('/auth/login', async (req, res) => {
 // Email verification callback
 router.post('/auth/verify-email', async (req, res) => {
   try {
-    const { token, type = 'email' } = req.body;
+    const { token, type = 'email', email } = req.body;
 
-    if (!token) {
-      return res.status(400).json({ error: 'Missing verification token' });
+    if (!token || !email) {
+      return res.status(400).json({ error: 'Missing verification token or email' });
     }
 
-    const result = await handleEmailVerification(token, type);
+    const result = await handleEmailVerification(token, type, email);
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });

@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   // Check if token is valid on mount
   useEffect(() => {

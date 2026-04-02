@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import { supabase } from '../services/supabaseService.js';
-import { sendVerificationEmail, sendWelcomeEmail } from '../services/resendService.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-prod';
 
@@ -82,21 +80,18 @@ export async function handleSignup(email, password, fullName) {
       return { success: false, error: 'Email already registered' };
     }
 
-    // Create user in Supabase Auth via ADMIN API (doesn't send email automatically)
-    const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+    // Create user in Supabase Auth with email verification required
+    const { data: authUser, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      email_confirm: false, // Don't auto-confirm (we'll use custom verification)
+      options: {
+        emailRedirectTo: `${process.env.CLIENT_URL}/auth/verify-email`,
+      },
     });
 
     if (authError) throw new Error(authError.message);
 
-    // Generate custom verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(verificationToken).digest('hex');
-    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Create user profile with verification token
+    // Create user profile in database
     const { data: newUser, error: createError } = await supabase
       .from('users')
       .insert([
@@ -106,24 +101,12 @@ export async function handleSignup(email, password, fullName) {
           full_name: fullName,
           auth_provider: 'email',
           email_verified: false,
-          verification_token: tokenHash,
-          token_expires_at: tokenExpiry.toISOString(),
         },
       ])
       .select()
       .single();
 
     if (createError) throw new Error(createError.message);
-
-    // Build verification link
-    const verificationLink = `${process.env.CLIENT_URL}/auth/verify-email?token=${verificationToken}`;
-
-    // Send verification email via Resend
-    const emailSent = await sendVerificationEmail(email, verificationLink, fullName);
-
-    if (!emailSent) {
-      console.warn(`Failed to send verification email to ${email}, but user was created`);
-    }
 
     // Don't generate JWT token - user must verify email first
     return {
@@ -216,78 +199,48 @@ export async function getUserById(userId) {
 }
 
 // Handle email verification callback
-export async function handleEmailVerification(token, type) {
+export async function handleEmailVerification(token, type, email) {
   try {
-    if (!token) {
-      throw new Error('Verification token is missing');
+    // Supabase uses 'email' or 'email_signup' as type
+    const verifyType = type || 'email';
+
+    if (!email) {
+      throw new Error('Email is required for verification');
     }
 
-    // Hash the incoming token to compare with stored hash
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    // Exchange token for session to verify email
+    const { data: session, error: sessionError } = await supabase.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: verifyType,
+    });
 
-    // Find user by token hash
-    const { data: user, error: fetchError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('verification_token', tokenHash)
-      .single();
-
-    if (fetchError || !user) {
-      throw new Error('Invalid verification token');
-    }
-
-    // Check if token has expired
-    if (new Date() > new Date(user.token_expires_at)) {
-      throw new Error('Verification token has expired. Please sign up again.');
-    }
-
-    // Check if already verified
-    if (user.email_verified) {
-      return {
-        success: true,
-        message: 'Email already verified! You can now log in.',
-        alreadyVerified: true,
-      };
-    }
-
-    // Mark email as verified in Supabase Auth
-    const { error: updateAuthError } = await supabase.auth.admin.updateUserById(
-      user.id,
-      { email_confirm: true }
-    );
-
-    if (updateAuthError) {
-      console.error('Failed to confirm email in Supabase Auth:', updateAuthError);
-      // Continue anyway - we'll mark it verified in our DB
+    if (sessionError) {
+      console.error('Supabase verifyOtp error:', sessionError);
+      throw new Error(sessionError.message);
     }
 
     // Update user profile to mark email as verified
-    const { data: updatedUser, error: updateError } = await supabase
+    const { data: user, error: updateError } = await supabase
       .from('users')
-      .update({
-        email_verified: true,
-        verification_token: null, // Clear the token
-        token_expires_at: null,
-      })
-      .eq('id', user.id)
+      .update({ email_verified: true })
+      .eq('id', session.user.id)
       .select()
       .single();
 
     if (updateError) throw new Error(updateError.message);
 
-    // Send welcome email
-    await sendWelcomeEmail(user.email, user.full_name);
-
     return {
       success: true,
       message: 'Email verified successfully! You can now log in.',
       user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        name: updatedUser.full_name,
+        id: user.id,
+        email: user.email,
+        name: user.full_name,
       },
     };
   } catch (error) {
+    console.error('Email verification error:', error);
     return { success: false, error: error.message };
   }
 }
