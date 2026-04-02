@@ -12,33 +12,44 @@ function VerifyEmailPage() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        // Get the verification token from URL
-        const token = searchParams.get('token');
+        // Supabase sends these parameters in the verification link
+        const tokenHash = searchParams.get('token_hash');
+        const type = searchParams.get('type') || 'email';
+        const email = searchParams.get('email'); // Added email extraction
 
-        console.log('Verification token from URL:', token);
+        console.log('Token hash from URL:', tokenHash);
+        console.log('Type:', type);
+        console.log('Email:', email);
+        console.log('API URL:', import.meta.env.VITE_API_URL);
 
-        if (!token) {
+        if (!tokenHash) {
           throw new Error('No verification token found in URL. The link may be incomplete or expired.');
         }
 
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/auth/verify-email`,
+          `${apiUrl}/auth/verify-email`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token }),
+            body: JSON.stringify({ token: tokenHash, type, email }), // Send email too
           }
         );
 
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error);
+          throw new Error(data.error || 'Verification failed');
         }
 
+        console.log('Verification successful!');
         setVerified(true);
         // Redirect to login after 3 seconds
         setTimeout(() => navigate('/login'), 3000);
       } catch (err) {
+        console.error('Verification error:', err);
         setError(err.message);
       } finally {
         setLoading(false);

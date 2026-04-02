@@ -16,7 +16,6 @@ Server runs on: `http://localhost:5173`
 client/
 ├── src/
 │   ├── components/
-│   │   ├── CalendarExport.jsx
 │   │   ├── ItineraryTimeline.jsx
 │   │   ├── MapWidget.jsx
 │   │   ├── ProtectedRoute.jsx
@@ -62,7 +61,6 @@ Create `.env` in `client/` directory:
 
 ```
 VITE_API_URL=http://localhost:5000/api
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
 ## Available Routes
