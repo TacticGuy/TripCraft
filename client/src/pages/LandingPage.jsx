@@ -148,7 +148,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="landing-footer">
-        <p>&copy; 2024 TripCraft. Craft your perfect journey.</p>
+        <p>&copy; 2026 TripCraft. Craft your perfect journey.</p>
       </footer>
     </div>
   );
