@@ -6,11 +6,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/TacticGuy/TripCraft">
-    <img src="client/src/assets/TripCraftLogo.png" alt="TripCraft logo" width="220">
-  </a>
-
-  <h3 align="center">TripCraft</h3>
+  <h1 align="center">TripCraft</h1>
 
   <p align="center">
     An AI-powered travel planner that turns a destination and a date range into a day-by-day itinerary with an interactive map and budget estimates.
@@ -47,8 +43,12 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#deployment">Deployment</a></li>
     <li><a href="#troubleshooting">Troubleshooting</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
+    <li>
+      <a href="#contributing">Contributing</a>
+      <ul>
+        <li><a href="#contributors">Contributors</a></li>
+      </ul>
+    </li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -194,21 +194,6 @@ TripCraft deploys to [Vercel](https://vercel.com) as **two projects** from the s
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Roadmap
-
-- [x] AI itinerary generation
-- [x] Interactive map with day filters
-- [x] Email and Google authentication
-- [x] Save, reopen and delete trips
-- [ ] Edit activities inside a saved itinerary
-- [ ] Share a trip with collaborators
-- [ ] Export an itinerary to PDF
-- [ ] More display currencies
-
-See the [open issues](https://github.com/TacticGuy/TripCraft/issues) for proposed features and known issues.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Contributing
 
 Contributions are what make the open source community such a great place to learn, inspire and create. Any contributions you make are **greatly appreciated**.
@@ -218,6 +203,12 @@ Contributions are what make the open source community such a great place to lear
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a pull request
+
+### Contributors
+
+<a href="https://github.com/TacticGuy/TripCraft/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=TacticGuy/TripCraft" alt="Contributors" />
+</a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
