@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './AuthPages.css';
 
@@ -8,21 +8,28 @@ function VerifyEmailPage() {
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState('');
+  const started = useRef(false);
 
   useEffect(() => {
+    // The token is single-use; StrictMode would otherwise verify twice and fail the second time
+    if (started.current) return;
+    started.current = true;
+
     const verifyEmail = async () => {
       try {
-        // Supabase sends these parameters in the verification link
+        // Supabase links arrive in one of two shapes:
+        //  - ?token_hash=...&type=email        (custom email template)
+        //  - #access_token=...&type=signup     (default template, already confirmed by Supabase)
+        //  - #error=...&error_description=...  (expired / already used link)
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const hashError = hash.get('error_description') || hash.get('error');
+        if (hashError) throw new Error(hashError.replace(/\+/g, ' '));
+
         const tokenHash = searchParams.get('token_hash');
-        const type = searchParams.get('type') || 'email';
-        const email = searchParams.get('email'); // Added email extraction
+        const accessToken = hash.get('access_token');
+        const type = searchParams.get('type') || hash.get('type') || 'email';
 
-        console.log('Token hash from URL:', tokenHash);
-        console.log('Type:', type);
-        console.log('Email:', email);
-        console.log('API URL:', import.meta.env.VITE_API_URL);
-
-        if (!tokenHash) {
+        if (!tokenHash && !accessToken) {
           throw new Error('No verification token found in URL. The link may be incomplete or expired.');
         }
 
@@ -32,19 +39,16 @@ function VerifyEmailPage() {
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: tokenHash, type, email }), // Send email too
+            body: JSON.stringify({ token: tokenHash, type, accessToken }),
           }
         );
 
-        console.log('Response status:', response.status);
         const data = await response.json();
-        console.log('Response data:', data);
 
         if (!response.ok) {
           throw new Error(data.error || 'Verification failed');
         }
 
-        console.log('Verification successful!');
         setVerified(true);
         // Redirect to login after 3 seconds
         setTimeout(() => navigate('/login'), 3000);

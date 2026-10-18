@@ -11,7 +11,18 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Service role client (for server operations, has full DB access)
-export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
+
+// Throwaway client for auth calls (signUp / signInWithPassword / verifyOtp).
+// These store the resulting user session on the client, so they must never run on
+// the shared service-role client or later queries would execute as that user.
+export function createAuthClient() {
+  return createClient(supabaseUrl, process.env.SUPABASE_ANON_KEY || supabaseServiceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
 
 // Initialize database schema (run once on startup)
 export async function initializeDatabase() {

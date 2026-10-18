@@ -9,6 +9,9 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
+// Behind Vercel's proxy: needed so rate limiting sees the real client IP
+app.set('trust proxy', 1);
+
 // CORS
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -39,10 +42,13 @@ app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().
 // Error handler (must be last)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 TripCraft server running on http://localhost:${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}\n`);
-});
+// On Vercel the app is exported and run as a serverless function, so don't listen
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`\n🚀 TripCraft server running on http://localhost:${PORT}`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}\n`);
+  });
+}
 
 export default app;

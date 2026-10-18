@@ -11,9 +11,9 @@ async function generateItinerary(req, res, next) {
       startDate,
       endDate,
       budget = 'moderate',
-      travelers = 1,
       interests = '',
     } = req.body;
+    const travelers = Math.min(20, Math.max(1, parseInt(req.body.travelers, 10) || 1));
 
     if (!destination || !startDate || !endDate) {
       return res.status(400).json({ error: 'destination, startDate, and endDate are required.' });
@@ -21,7 +21,10 @@ async function generateItinerary(req, res, next) {
 
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return res.status(400).json({ error: 'startDate and endDate must be valid dates.' });
+    }
+    const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
     if (days < 1 || days > 21) {
       return res.status(400).json({ error: 'Trip must be between 1 and 21 days.' });
@@ -37,7 +40,7 @@ async function generateItinerary(req, res, next) {
 
     res.json({
       meta: {
-        destination, startDate, endDate, days, budget, travelers,
+        destination, startDate, endDate, days, budget, travelers, interests,
         generatedAt: new Date().toISOString(),
         totalEstimatedBudget: totalBudget * travelers,
       },

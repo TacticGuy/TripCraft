@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { extractMapMarkers, computeMapCenter, categoryColor, categoryIcon } from '../utils/mapHelpers.js';
@@ -12,6 +12,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Itinerary text comes from an LLM, so escape it before interpolating into popup HTML
+const escapeHtml = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
+
 export default function MapWidget({ itinerary, onMarkerClick, activeMarkerId, currency }) {
   const mapRef = useRef(null);
   const leafletMapRef = useRef(null);
@@ -19,11 +24,12 @@ export default function MapWidget({ itinerary, onMarkerClick, activeMarkerId, cu
   const [selectedDay, setSelectedDay] = useState('all');
   const [mapReady, setMapReady] = useState(false);
 
-  const markers = extractMapMarkers(itinerary || []);
-  const days = [...new Set(markers.map((m) => m.day))].sort((a, b) => a - b);
-  const filteredMarkers = selectedDay === 'all'
-    ? markers
-    : markers.filter((m) => m.day === Number(selectedDay));
+  const markers = useMemo(() => extractMapMarkers(itinerary || []), [itinerary]);
+  const days = useMemo(() => [...new Set(markers.map((m) => m.day))].sort((a, b) => a - b), [markers]);
+  const filteredMarkers = useMemo(
+    () => (selectedDay === 'all' ? markers : markers.filter((m) => m.day === Number(selectedDay))),
+    [markers, selectedDay]
+  );
 
   const currencySymbol = currency === 'INR' ? '₹' : '$';
   const currencyRate = currency === 'INR' ? 83.5 : 1;
@@ -45,9 +51,17 @@ export default function MapWidget({ itinerary, onMarkerClick, activeMarkerId, cu
       scrollWheelZoom: true,
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
-      maxZoom: 19,
+    // CARTO Voyager (OpenStreetMap data) labels places in Latin script/English,
+    // unlike the default OSM tiles which use each country's local language.
+    const cartoKey = import.meta.env.VITE_CARTO_API_KEY;
+    // Keyed CARTO tiles are served from tiles.basemaps.cartocdn.com with a `key` param
+    const tileUrl = cartoKey
+      ? `https://tiles.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(cartoKey)}`
+      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    L.tileLayer(tileUrl, {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
     }).addTo(map);
 
     setTimeout(() => map.invalidateSize(), 200);
@@ -111,7 +125,7 @@ export default function MapWidget({ itinerary, onMarkerClick, activeMarkerId, cu
       });
 
       const costStr = markerData.cost?.amount
-        ? `<p style="font-size:11px;color:#888;margin:2px 0">💰 ${formatCost(markerData.cost.amount)}/${markerData.cost.per}</p>`
+        ? `<p style="font-size:11px;color:#888;margin:2px 0">💰 ${formatCost(markerData.cost.amount)}/${escapeHtml(markerData.cost.per)}</p>`
         : '';
 
       const marker = L.marker([markerData.lat, markerData.lng], { icon: customIcon, zIndexOffset: isActive ? 1000 : 0 })
@@ -120,12 +134,12 @@ export default function MapWidget({ itinerary, onMarkerClick, activeMarkerId, cu
           <div style="font-family:system-ui,sans-serif;min-width:190px;max-width:240px;">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
               <span style="font-size:18px">${icon}</span>
-              <strong style="font-size:13px;color:${color};line-height:1.3">${markerData.name}</strong>
+              <strong style="font-size:13px;color:${color};line-height:1.3">${escapeHtml(markerData.name)}</strong>
             </div>
-            ${markerData.description ? `<p style="font-size:12px;color:#444;margin-bottom:5px;line-height:1.45">${markerData.description}</p>` : ''}
-            ${markerData.time ? `<p style=\"font-size:11px;color:#888;margin:2px 0\">${markerData.time}</p>` : ''}
+            ${markerData.description ? `<p style="font-size:12px;color:#444;margin-bottom:5px;line-height:1.45">${escapeHtml(markerData.description)}</p>` : ''}
+            ${markerData.time ? `<p style=\"font-size:11px;color:#888;margin:2px 0\">${escapeHtml(markerData.time)}</p>` : ''}
             ${costStr}
-            ${markerData.address ? `<p style=\"font-size:10px;color:#aaa;margin-top:5px\">${markerData.address}</p>` : ''}
+            ${markerData.address ? `<p style=\"font-size:10px;color:#aaa;margin-top:5px\">${escapeHtml(markerData.address)}</p>` : ''}
           </div>
         `, { maxWidth: 260 });
 

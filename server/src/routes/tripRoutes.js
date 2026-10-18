@@ -4,8 +4,8 @@ import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// All trip routes require authentication
-router.use(authenticateToken);
+// All /trips routes require authentication (scoped so other /api routes are unaffected)
+router.use('/trips', authenticateToken);
 
 // Create a new trip
 router.post('/trips', async (req, res) => {
@@ -69,7 +69,7 @@ router.get('/trips/:id', async (req, res) => {
 // Update trip
 router.put('/trips/:id', async (req, res) => {
   try {
-    const result = await updateTrip(req.params.id, req.user.userId, req.body);
+    const result = await updateTrip(req.params.id, req.user.userId, req.body || {});
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });

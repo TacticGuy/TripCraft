@@ -38,7 +38,7 @@ function DashboardPage() {
     };
 
     fetchTrips();
-  }, [token]);
+  }, [token, API_URL]);
 
   const handleLogout = () => {
     logout();
@@ -46,7 +46,7 @@ function DashboardPage() {
   };
 
   const handleCreateTrip = () => {
-    navigate('/');
+    navigate('/plan-trip');
   };
 
   const handleViewTrip = async (tripId) => {
@@ -68,8 +68,10 @@ function DashboardPage() {
           destination: trip.destination,
           startDate: trip.start_date,
           endDate: trip.end_date,
+          days: (trip.itinerary || []).length,
           budget: trip.budget_level,
           travelers: trip.num_travelers,
+          interests: trip.interests || '',
           generatedAt: trip.created_at,
         },
         itinerary: trip.itinerary || [],
@@ -143,9 +145,11 @@ function DashboardPage() {
           ) : (
             <div className="trips-grid">
               {trips.map((trip) => {
-                const startDate = new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const endDate = new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const days = Math.ceil((new Date(trip.end_date) - new Date(trip.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+                const start = new Date(`${trip.start_date}T00:00:00`);
+                const end = new Date(`${trip.end_date}T00:00:00`);
+                const startDate = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const endDate = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const days = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
                 
                 return (
                   <div key={trip.id} className="trip-card">

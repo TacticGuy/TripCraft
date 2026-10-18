@@ -1,5 +1,5 @@
 import express from 'express';
-import { handleGoogleLogin, handleSignup, handleLogin, verifyToken, getUserById, handleEmailVerification } from '../controllers/authController.js';
+import { handleGoogleLogin, handleSignup, handleLogin, getUserById, handleEmailVerification } from '../controllers/authController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -7,13 +7,13 @@ const router = express.Router();
 // Google OAuth callback
 router.post('/auth/google', async (req, res) => {
   try {
-    const { googleToken, profile } = req.body;
+    const { googleToken } = req.body;
 
-    if (!googleToken || !profile) {
-      return res.status(400).json({ error: 'Missing googleToken or profile' });
+    if (!googleToken) {
+      return res.status(400).json({ error: 'Missing googleToken' });
     }
 
-    const result = await handleGoogleLogin(googleToken, profile);
+    const result = await handleGoogleLogin(googleToken);
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });
@@ -70,13 +70,13 @@ router.post('/auth/login', async (req, res) => {
 // Email verification callback
 router.post('/auth/verify-email', async (req, res) => {
   try {
-    const { token, type = 'email', email } = req.body;
+    const { token, type = 'email', accessToken } = req.body;
 
-    if (!token || !email) {
-      return res.status(400).json({ error: 'Missing verification token or email' });
+    if (!token && !accessToken) {
+      return res.status(400).json({ error: 'Missing verification token' });
     }
 
-    const result = await handleEmailVerification(token, type, email);
+    const result = await handleEmailVerification({ tokenHash: token, type, accessToken });
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });
