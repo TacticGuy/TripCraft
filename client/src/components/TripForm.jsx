@@ -179,42 +179,6 @@ export default function TripForm({ onSubmit, loading }) {
         </div>
       </div>
 
-      {/* Airport codes (optional) */}
-      <div className="form-section collapsible">
-        <details>
-          <summary className="form-label collapsible-toggle">
-            Flight Pricing (optional)
-            <span className="toggle-arrow">›</span>
-          </summary>
-          <div className="form-row" style={{ marginTop: '12px' }}>
-            <div className="form-section" style={{ margin: 0 }}>
-              <label className="form-label-sm">Origin Airport Code</label>
-              <input
-                className="form-input"
-                type="text"
-                placeholder="e.g. JFK"
-                maxLength={3}
-                value={form.originAirportCode}
-                onChange={(e) => set('originAirportCode', e.target.value.toUpperCase())}
-                disabled={loading}
-              />
-            </div>
-            <div className="form-section" style={{ margin: 0 }}>
-              <label className="form-label-sm">Destination Airport Code</label>
-              <input
-                className="form-input"
-                type="text"
-                placeholder="e.g. NRT"
-                maxLength={3}
-                value={form.destinationAirportCode}
-                onChange={(e) => set('destinationAirportCode', e.target.value.toUpperCase())}
-                disabled={loading}
-              />
-            </div>
-          </div>
-        </details>
-      </div>
-
       {/* Submit */}
       <button className="submit-btn" type="submit" disabled={loading}>
         {loading ? (

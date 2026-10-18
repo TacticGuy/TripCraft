@@ -1,21 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Toast.css';
 
 export function Toast({ message, type = 'info', duration = 5000, onClose }) {
   const [isClosing, setIsClosing] = useState(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!message) return;
+    setIsClosing(false);
 
+    let closeTimer;
     const timer = setTimeout(() => {
       setIsClosing(true);
-      setTimeout(() => {
-        onClose?.();
-      }, 300);
+      closeTimer = setTimeout(() => onCloseRef.current?.(), 300);
     }, duration);
 
-    return () => clearTimeout(timer);
-  }, [message, duration, onClose]);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(closeTimer);
+    };
+  }, [message, duration]);
 
   if (!message) return null;
 
