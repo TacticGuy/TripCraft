@@ -31,7 +31,7 @@ export default function ItineraryTimeline({ itinerary, meta, onActivityClick, ac
         <div className="summary-divider" />
         <div className="summary-item">
           <span className="summary-label">Duration</span>
-          <span className="summary-value">{meta.days} days</span>
+          <span className="summary-value">{meta.days || itinerary.length} days</span>
         </div>
         <div className="summary-divider" />
         <div className="summary-item">

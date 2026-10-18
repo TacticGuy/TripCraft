@@ -36,7 +36,7 @@ export default function ItineraryView() {
         endDate: meta.endDate,
         budgetLevel: meta.budget,
         numTravelers: meta.travelers,
-        interests: '',
+        interests: meta.interests || '',
         itinerary: itinerary,
       };
 
@@ -104,7 +104,7 @@ export default function ItineraryView() {
         <Link to="/" className="nav-brand-link">
           <h3 className="nav-brand">TripCraft</h3>
         </Link>
-        <button className="back-btn" onClick={() => navigate(tripId ? '/dashboard' : '/')}>
+        <button className="back-btn" onClick={() => navigate(tripId ? '/dashboard' : '/plan-trip')}>
           {tripId ? '← Back to Trips' : '← New Trip'}
         </button>
         <div className="nav-title">
