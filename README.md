@@ -34,11 +34,23 @@ Create a `.env` file in the `server` directory:
 PORT=5000
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
+GROQ_API_KEY=<from console.groq.com>
+SUPABASE_URL=<project url>
+SUPABASE_ANON_KEY=<anon key>
+SUPABASE_SERVICE_KEY=<service role key>
+JWT_SECRET=<long random string; required when NODE_ENV=production>
+GOOGLE_OAUTH_ID=<Google OAuth client id; used to validate Google sign-in tokens>
 ```
+
+In Supabase, set **Authentication → URL Configuration → Site URL** to your client URL and add
+`http://localhost:5173/auth/verify-email` to the Redirect URLs. The default confirmation email template
+works as-is; a custom template linking to
+`{{ .SiteURL }}/auth/verify-email?token_hash={{ .TokenHash }}&type=email` also works.
 
 Create a `.env` file in the `client` directory:
 ```
 VITE_API_URL=http://localhost:5000/api
+VITE_GOOGLE_OAUTH_ID=<Google OAuth client id>
 ```
 
 ### 3. Run the Application
