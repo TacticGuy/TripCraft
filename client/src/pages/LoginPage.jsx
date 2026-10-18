@@ -43,16 +43,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // Decode the JWT to get profile info
-      const decoded = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
-      const profile = {
-        sub: decoded.sub,
-        email: decoded.email,
-        name: decoded.name,
-        picture: decoded.picture,
-      };
-
-      await loginWithGoogle(credentialResponse.credential, profile);
+      await loginWithGoogle(credentialResponse.credential);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

@@ -39,13 +39,13 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   // Google OAuth login
-  const loginWithGoogle = useCallback(async (googleToken, profile) => {
+  const loginWithGoogle = useCallback(async (googleToken) => {
     setError(null);
     try {
       const response = await fetch(`${API_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ googleToken, profile }),
+        body: JSON.stringify({ googleToken }),
       });
 
       if (!response.ok) {
