@@ -2,8 +2,11 @@ import Groq from 'groq-sdk';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+// Override with GROQ_MODEL in .env if Groq retires this model again
+const MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
 /**
- * Calls Groq (llama-3.3-70b) to generate a structured travel itinerary.
+ * Calls Groq to generate a structured travel itinerary.
  * @param {Object} params - { destination, startDate, endDate, days, budget, travelers, interests }
  * @returns {Array} Parsed JSON array of day objects
  */
@@ -60,13 +63,16 @@ The JSON array must have exactly ${days} objects, one per day. Each object must 
 Generate realistic coordinates for all locations. Include 4-6 activities per day. Make it genuinely exciting and locally authentic.`;
 
   const completion = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
+    model: MODEL,
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
     temperature: 0.7,
-    max_tokens: 8192,
+    // Reasoning models spend part of the budget on hidden reasoning; keep it low
+    // and leave plenty of room for the JSON itself.
+    max_tokens: 32768,
+    reasoning_effort: 'low',
   });
 
   const text = completion.choices[0].message.content.trim();
