@@ -13,8 +13,18 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS
+// CLIENT_URL may hold several comma-separated origins; trailing slashes are ignored
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // No Origin header = same-origin / curl / server-to-server
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(null, false);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
