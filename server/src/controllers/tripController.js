@@ -13,8 +13,8 @@ export async function createTrip(userId, tripData) {
           destination,
           start_date: startDate,
           end_date: endDate,
-          budget_level: budgetLevel,
-          num_travelers: numTravelers,
+          budget_level: budgetLevel || 'moderate',
+          num_travelers: numTravelers || 1,
           interests,
           itinerary: itinerary,
           status: 'draft',
@@ -66,9 +66,26 @@ export async function getTripById(tripId, userId) {
 // Update trip
 export async function updateTrip(tripId, userId, updates) {
   try {
+    // Whitelist editable fields (map camelCase API names to columns) so clients
+    // cannot overwrite id / user_id / timestamps.
+    const columnMap = {
+      destination: 'destination',
+      startDate: 'start_date',
+      endDate: 'end_date',
+      budgetLevel: 'budget_level',
+      numTravelers: 'num_travelers',
+      interests: 'interests',
+      itinerary: 'itinerary',
+      status: 'status',
+    };
+    const row = { updated_at: new Date().toISOString() };
+    for (const [key, column] of Object.entries(columnMap)) {
+      if (updates[key] !== undefined) row[column] = updates[key];
+    }
+
     const { data, error } = await supabase
       .from('trips')
-      .update(updates)
+      .update(row)
       .eq('id', tripId)
       .eq('user_id', userId)
       .select()
